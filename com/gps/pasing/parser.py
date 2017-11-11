@@ -13,23 +13,12 @@ class Location:
     milisec = None
     accuracy = None
 
-    def __init__(self,lat,long,date):
-        if lat is not None and long is not None and date is not None:
-            self.longitude = long
-            self.latitude = lat
-            self.date = date
-            if type(self.date) is not datetime.datetime:
-                raise Exception("Invalid Data for creating Location object {} - {} - {}".format(lat, long, date))
-
-        else:
-            print(type(self.date))
-            raise Exception("Invalid Data for creating Location object {} - {} - {}".format(lat,long,date))
 
     def __init__(self, loc):
         self.lat = loc['latitudeE7']
         self.long = loc['longitudeE7']
         self.accuracy = loc['accuracy']
-        self.milisec = loc["timestampMs"]
+        self.milisec = int(loc["timestampMs"])
 
         time = int(loc["timestampMs"]) / 1000
         date = datetime.datetime.fromtimestamp(
@@ -48,10 +37,11 @@ class Location:
             raise Exception("Invalid Data for creating Location object {} - {} - {}".format(self.lat, self.long, self.date))
 
     def __str__(self):
-        return str("Date : {} - Latitude : {} - Longitude : {}".format(self.date.strftime('%Y-%m-%d'),self.latitude,self.longitude))
+        return str("Time : {} - Latitude : {} - Longitude : {}".format(self.milisec,self.latitude,self.longitude))
 
     def __repr__(self):
-        return str("Date : {} - Latitude : {} - Longitude : {}".format(self.date.strftime('%Y-%m-%d'),self.latitude,self.longitude))
+        # return str("Date : {} - Latitude : {} - Longitude : {}".format(self.date.strftime('%Y-%m-%d'),self.latitude,self.longitude))
+        return str("Time : {} - Latitude : {} - Longitude : {}".format(self.milisec, self.latitude, self.longitude))
 
 
 class DataModel:
@@ -63,6 +53,8 @@ class DataModel:
         my_file = Path(path)
         if my_file.exists() is False:
             raise Exception("Invalid File path, {} check if it exist".format(path))
+        else:
+            self.path = path
 
     def load_data_array(self):
         with open(self.path) as data_file:
@@ -92,12 +84,12 @@ class DataModel:
                 else:
                     loc_map[key] = [loc]
 
-                print("** i {}".format(i))
+                print("** i {} - {}".format(i,loc))
 
-            pickle.dump(loc_map, open("locations_map.p", "wb"))
+            pickle.dump(loc_map, open("/Users/rohit/Documents/Projects/GPSEXIF/com/gps/data/locations_map.p", "wb"))
 
     def get_location_map(self):
-        with open(r"locations_map.p", "rb") as input_file:
+        with open("/Users/rohit/Documents/Projects/GPSEXIF/com/gps/data/locations_map.p", "rb") as input_file:
             return pickle.load(input_file)
 
 
@@ -120,6 +112,3 @@ class DataModel:
     #         for i in range(10):
     #             # l = json_data[i]
     #             print(data[i], len(json_data[data[i]]))
-
-
-

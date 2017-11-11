@@ -2,7 +2,7 @@ import datetime
 import pickle
 import piexif
 # from LatLon.lat_lon import LatLon
-
+import com.gps.pasing.parser
 from com.gps.pasing.parser import Location, DataModel
 
 
@@ -26,19 +26,62 @@ class GeoTag:
         data = DataModel().get_location_map()
         return self.search(tag,data)
 
-    def search(self,location,data):
+    def search(self, location, data, tolerance=20, assign_priority=0):
+        tolerance *= 60000
         key = location.date.strftime('%Y-%m-%d')
         if key in data:
-            list = data[key]
+            list_loc = data[key]
             time_diff_list = []
-            for i in list:
-                time_diff_list.append(location.milisec - i.milisec)
-
-            return min(time_diff_list)
+            tmp_obj = []
+            for i in list_loc:
+                diff = location.milisec - i.milisec
+                if assign_priority == 0:
+                    diff= abs(diff)
+                    if 0 <= diff < tolerance:
+                        time_diff_list.append(abs(location.milisec - i.milisec))
+                        tmp_obj.append(i)
+                        # print("Current Loc {} - diff : {}".format(i,diff))
+                elif assign_priority > 0:
+                    if 0 <= diff < tolerance:
+                        time_diff_list.append(location.milisec - i.milisec)
+                        tmp_obj.append(i)
+                        # print("Current Loc {} - diff : {}".format(i, diff))
+                elif assign_priority < 0:
+                    if 0 >= diff > -tolerance:
+                        time_diff_list.append(abs(location.milisec - i.milisec))
+                        tmp_obj.append(i)
+                        # print("Current Loc {} - diff : {}".format(i, diff))
+            return tmp_obj[time_diff_list.index(min(time_diff_list))]
         else:
             return None
 
-
+        # def search(self, location, data, tolerance=20, assign_priority=1):
+        #     tolerance *= 60000
+        #     key = location.date.strftime('%Y-%m-%d')
+        #     if key in data:
+        #         list_loc = data[key]
+        #         time_diff_list = []
+        #         for i in list_loc:
+        #             diff = location.milisec - i.milisec
+        #             if assign_priority == 0:
+        #                 if 0 > diff > -tolerance:
+        #                     time_diff_list.append(location.milisec - i.milisec)
+        #                     print("Current Loc {} - diff : {}".format(i, diff))
+        #                 elif 0 <= diff < tolerance:
+        #                     time_diff_list.append(location.milisec - i.milisec)
+        #                     print("Current Loc {} - diff : {}".format(i, diff))
+        #             elif assign_priority > 0:
+        #                 if 0 <= diff < tolerance:
+        #                     time_diff_list.append(location.milisec - i.milisec)
+        #                     print("Current Loc {} - diff : {}".format(i, diff))
+        #             elif assign_priority < 0:
+        #                 if 0 >= diff > -tolerance:
+        #                     time_diff_list.append(location.milisec - i.milisec)
+        #                     print("Current Loc {} - diff : {}".format(i, diff))
+        #
+        #         return list_loc[time_diff_list.index(min(time_diff_list))]
+        #     else:
+        #         return None
 
 # g=GeoTag().find()
 
@@ -63,4 +106,4 @@ def decdeg2dms(dd):
             seconds = -seconds
     return (degrees,minutes,seconds)
 
-print(decdeg2dms(73.9136041944444))
+print(decdeg2dms(185636347/10000000))
