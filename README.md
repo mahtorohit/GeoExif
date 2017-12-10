@@ -1,7 +1,7 @@
 # GeoExif
 Add geo tag to images from imported google Map takeout JSON
 
-Inline-style:
+Application overviewt:
 ![Application overviewt](https://github.com/mahtorohit/GeoExif/blob/master/app.png "Application overview")
 
 
