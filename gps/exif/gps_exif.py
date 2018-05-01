@@ -34,12 +34,6 @@ class MyFirstGUI():
         self.load_location_file.grid(row=2, columnspan=7, ipady=10)
         # #########################
 
-        self.remove_geo_tags = Button(master, text="Remove Geo Tags", command=self.load_json_file)
-        self.remove_geo_tags.grid(row=3, columnspan=3.5, ipady=10)
-
-        self.remove_all_tags = Button(master, text="Remove All Exif Tags", command=self.load_json_file)
-        self.remove_all_tags.grid(row=3, columnspan=3.5, ipady=10)
-
         #  Step 3
         # Select Location assign parameter : Accuracy
         self.time_accuracy = IntVar()
@@ -90,6 +84,12 @@ class MyFirstGUI():
         self.process = Button(master, text="Start Processing", command=self.process_imges).grid(row=11, columnspan=7, ipady=10)
         # #########################
 
+        self.remove_geo_tags = Button(master, text="Remove Geo Tags", command=self.remove_geo_tag)
+        self.remove_geo_tags.grid(row=12, column=1)
+
+        self.remove_all_tags = Button(master, text="Remove All Exif Tags", command=self.load_json_file)
+        self.remove_all_tags.grid(row=12, column=5)
+
     def is_number(self,s):
         try:
             float(s)
@@ -131,11 +131,20 @@ class MyFirstGUI():
     def remove_geo_tag(self):
         self.check_files()
 
-        def remove(self,filename):
+        def remove(path):
             self.working = True
+            ExifOps.remove_gps_tags(path)
 
+        threading._start_new_thread(remove, (self.op_path,))
 
-        threading._start_new_thread(remove, (self,filename))
+    def remove_all_tags(self):
+        self.check_files()
+
+        def remove(path):
+            self.working = True
+            ExifOps.remove_all_tags(path)
+
+        threading._start_new_thread(remove, (self.op_path,))
 
     def process_imges(self):
         self.check_files()
