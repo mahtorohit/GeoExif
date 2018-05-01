@@ -34,6 +34,11 @@ class MyFirstGUI():
         self.load_location_file.grid(row=2, columnspan=7, ipady=10)
         # #########################
 
+        self.remove_geo_tags = Button(master, text="Remove Geo Tags", command=self.load_json_file)
+        self.remove_geo_tags.grid(row=3, columnspan=3.5, ipady=10)
+
+        self.remove_all_tags = Button(master, text="Remove All Exif Tags", command=self.load_json_file)
+        self.remove_all_tags.grid(row=3, columnspan=3.5, ipady=10)
 
         #  Step 3
         # Select Location assign parameter : Accuracy
@@ -123,13 +128,17 @@ class MyFirstGUI():
 
         threading._start_new_thread(load_data, (self,filename))
 
+    def remove_geo_tag(self):
+        self.check_files()
+
+        def remove(self,filename):
+            self.working = True
+
+
+        threading._start_new_thread(remove, (self,filename))
+
     def process_imges(self):
-        if self.working:
-            tkMessageBox.showinfo("Exif Tool", "Wait till current tasks get's finished !")
-            return
-        if self.op_path is None:
-            tkMessageBox.showinfo("Exif Tool", "Please select Images to process!")
-            return
+        self.check_files()
 
         def execute(self):
             self.working = True
@@ -154,6 +163,14 @@ class MyFirstGUI():
         diff /= 60000
         tkMessageBox.showinfo("Say Hello", "{} - \n diff is {} min".format(str(data),diff))
         self.working = False
+
+    def check_files(self):
+        if self.working:
+            tkMessageBox.showinfo("Exif Tool", "Wait till current tasks get's finished !")
+            return
+        if self.op_path is None:
+            tkMessageBox.showinfo("Exif Tool", "Please select Images to process!")
+            return
 
 root = Tk()
 my_gui = MyFirstGUI(root)

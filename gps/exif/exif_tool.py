@@ -1,8 +1,10 @@
 import time
 from datetime import datetime
 import piexif
+from tkinter import messagebox as tkMessageBox
 from gps.exif.search_geotag import GeoTag, AccuracyTolerance, LocationPriority, LocationOverWrite, OperationType
 from gps.pasing.google_parser import Location
+from gps.exif.file_walker import FileManager
 
 
 class ExifOps:
@@ -66,7 +68,6 @@ class ExifOps:
 
     @staticmethod
     def batch_job(path,time_accuracy,time_priority,overwrite,op):
-        from gps.exif.file_walker import FileManager
         files = FileManager().get_all_files(path)
         g = GeoTag()
         count = 0
@@ -89,9 +90,36 @@ class ExifOps:
 
     @staticmethod
     def add_gps_available_test(image,gps):
-        exif_dict = exif_dict = piexif.load(image)
+        exif_dict = piexif.load(image)
         exif_dict['GPS'][piexif.GPSIFD.GPSLatitude] = ExifOps.decdeg2dms(gps[0] / 10000000)
         exif_dict['GPS'][piexif.GPSIFD.GPSLongitude] = ExifOps.decdeg2dms(gps[1] / 10000000)
         exif_bytes = piexif.dump(exif_dict)
         piexif.insert(exif_bytes, image)
 
+    @staticmethod
+    def remove_gps_tags(path):
+        files = FileManager().get_all_files(path)
+        file_effected = 0
+        for file in files:
+            if file.endswith('.JPG') or file.endswith('.JPEG'):
+                if ExifOps.is_gps_available(file) is True:
+                    exif_dict = piexif.load(file)
+                    del(exif_dict['GPS'][piexif.GPSIFD.GPSLatitude])
+                    del(exif_dict['GPS'][piexif.GPSIFD.GPSLongitude])
+                    exif_bytes = piexif.dump(exif_dict)
+                    piexif.insert(exif_bytes, file)
+                    file_effected+=1
+        tkMessageBox.showinfo("GeoExif", "{} - Files effected".format(file_effected))
+
+
+    @staticmethod
+    def remove_all_tags(path):
+        files = FileManager().get_all_files(path)
+        file_effected = 0
+        for file in files:
+            if file.endswith('.JPG') or file.endswith('.JPEG'):
+                exif_dict = []
+                exif_bytes = piexif.dump(exif_dict)
+                piexif.insert(exif_bytes, file)
+                file_effected+=1
+        tkMessageBox.showinfo("GeoExif", "{} - Files effected".format(file_effected))

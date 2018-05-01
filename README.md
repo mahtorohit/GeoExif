@@ -22,3 +22,9 @@ Basic useful feature list:
  * Operation Type :
  	Search: Will only search for changes & show the count of effecting files
     Execute: Will make changes according to above-selected criteria
+
+
+License
+----
+
+MIT
